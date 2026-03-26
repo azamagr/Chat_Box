@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stylish Chat App</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            width: 90%;
+        }
+
+        .chat-box {
+            flex: 1;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 15px;
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .chat-box h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .msg {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 15px;
+            width: fit-content;
+            max-width: 70%;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .sent {
+            background: #00c6ff;
+            margin-left: auto;
+        }
+
+        .received {
+            background: #fff;
+            color: #000;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 5px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background: #00c6ff;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0072ff;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(5px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- USER A -->
+    <div class="chat-box">
+        <h3>👤 User A</h3>
+        <div class="messages" id="chatA"></div>
+
+        <div class="input-area">
+            <input type="text" id="msgA" placeholder="Type message...">
+            <button onclick="sendMsg('A','B','#msgA')">Send</button>
+        </div>
+    </div>
+
+    <!-- USER B -->
+    <div class="chat-box">
+        <h3>👤 User B</h3>
+        <div class="messages" id="chatB"></div>
+
+        <div class="input-area">
+            <input type="text" id="msgB" placeholder="Type message...">
+            <button onclick="sendMsg('B','A','#msgB')">Send</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function sendMsg(sender, receiver, inputId) {
+    let msg = $(inputId).val();
+
+    if(msg.trim() == "") return;
+
+    $.post("send.php", {
+        sender: sender,
+        receiver: receiver,
+        message: msg
+    }, function() {
+        $(inputId).val("");
+        loadChat();
+    });
+}
+
+setInterval(loadChat, 1000);
+
+function loadChat() {
+    $.get("fetch.php", function(data) {
+        let chats = JSON.parse(data);
+
+        $("#chatA").html("");
+        $("#chatB").html("");
+
+        chats.forEach(function(row) {
+
+            // USER A VIEW
+            if (row.sender == "A") {
+                $("#chatA").append(`<div class="msg sent">${row.message}</div>`);
+                $("#chatB").append(`<div class="msg received">${row.message}</div>`);
+            } else {
+                $("#chatA").append(`<div class="msg received">${row.message}</div>`);
+                $("#chatB").append(`<div class="msg sent">${row.message}</div>`);
+            }
+
+        });
+
+        // auto scroll
+        $(".messages").scrollTop(10000);
+    });
+}
+</script>
+
+</body>
+</html>
