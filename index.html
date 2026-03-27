@@ -2,141 +2,269 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>2 User Chat System</title>
+<title>Chatting Box 🌷</title>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial;
-    background: #ece5dd;
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fb;
     display: flex;
     justify-content: space-around;
-    padding: 20px;
+    align-items: center;
+    height: 100vh;
+    transition: 0.3s;
+}
+
+/* DARK MODE */
+body.dark {
+    background: #121212;
 }
 
 /* Chat Box */
 .chat {
-    width: 300px;
-    height: 500px;
-    background: white;
-    border-radius: 10px;
+    width: 330px;
+    height: 540px;
+    background: #ffffff;
+    border-radius: 25px;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: 0.3s;
 }
 
+body.dark .chat {
+    background: #1e1e1e;
+}
+
+/* Header */
 .header {
-    background: #075e54;
-    color: white;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+    background: #4facfe;
+    color: white;
+    position: relative;
 }
 
+/* Toggle Button */
+.toggle {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: white;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+body.dark .toggle {
+    background: #333;
+    color: white;
+}
+
+/* Messages */
 .messages {
     flex: 1;
-    padding: 10px;
+    padding: 15px;
     overflow-y: auto;
+    background: #f9fafc;
+    transition: 0.3s;
 }
 
+body.dark .messages {
+    background: #2a2a2a;
+}
+
+/* Bubble */
 .msg {
-    padding: 8px 12px;
-    margin: 5px 0;
-    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    border-radius: 18px;
     max-width: 70%;
-    clear: both;
+    font-size: 13px;
 }
 
-.left {
-    background: #fff;
-    float: left;
-}
-
+/* He */
 .right {
-    background: #dcf8c6;
-    float: right;
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+}
+
+/* She */
+.left {
+    background: #e4e6eb;
+    color: #333;
+    margin-right: auto;
+}
+
+body.dark .left {
+    background: #444;
+    color: white;
+}
+
+/* Time */
+.time {
+    display: block;
+    font-size: 10px;
+    margin-top: 5px;
+    opacity: 0.6;
 }
 
 /* Input */
 .input {
     display: flex;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+body.dark .input {
+    border-top: 1px solid #444;
 }
 
 .input input {
     flex: 1;
     padding: 10px;
-    border: none;
+    border-radius: 20px;
+    border: 1px solid #ddd;
     outline: none;
 }
 
+body.dark input {
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
 .input button {
-    padding: 10px;
+    margin-left: 8px;
+    padding: 10px 15px;
     border: none;
-    background: #25d366;
+    border-radius: 50%;
+    background: #007bff;
     color: white;
     cursor: pointer;
+}
+
+/* Toggle Position Top */
+.top-bar {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.top-bar button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background: black;
+    color: white;
+}
+
+body.dark .top-bar button {
+    background: white;
+    color: black;
 }
 </style>
 
 </head>
 <body>
 
-<!-- USER A -->
+<!-- TOP THEME BUTTON -->
+<div class="top-bar">
+    <button id="themeBtn">🌙 Dark Mode</button>
+</div>
+
+<!-- HE -->
 <div class="chat">
-    <div class="header">👨 User A</div>
+    <div class="header">💙 He</div>
     <div class="messages" id="chatA"></div>
     <div class="input">
-        <input type="text" id="msgA" placeholder="Type...">
-        <button onclick="sendA()">Send</button>
+        <input type="text" id="msgA" placeholder="Type message...">
+        <button onclick="sendA()">➤</button>
     </div>
 </div>
 
-<!-- USER B -->
+<!-- SHE -->
 <div class="chat">
-    <div class="header">👩 User B</div>
+    <div class="header">💖 She</div>
     <div class="messages" id="chatB"></div>
     <div class="input">
-        <input type="text" id="msgB" placeholder="Type...">
-        <button onclick="sendB()">Send</button>
+        <input type="text" id="msgB" placeholder="Type message...">
+        <button onclick="sendB()">➤</button>
     </div>
 </div>
 
 <script>
+// THEME TOGGLE
+$("#themeBtn").click(function(){
+    $("body").toggleClass("dark");
+
+    if($("body").hasClass("dark")){
+        $(this).text("☀️ Light Mode");
+    } else {
+        $(this).text("🌙 Dark Mode");
+    }
+});
+
+// TIME
+function getTime(){
+    let d = new Date();
+    return d.getHours() + ":" + ("0"+d.getMinutes()).slice(-2);
+}
+
+// SEND A
 function sendA(){
     let msg = $("#msgA").val().trim();
-    if(msg === "") return;
+    if(msg==="") return;
 
-    // A side (right)
-    $("#chatA").append('<div class="msg right">'+msg+'</div>');
+    let t = getTime();
 
-    // B side (left)
-    $("#chatB").append('<div class="msg left">'+msg+'</div>');
+    $("#chatA").append(`<div class="msg right">${msg}<span class="time">${t}</span></div>`);
+    $("#chatB").append(`<div class="msg left">${msg}<span class="time">${t}</span></div>`);
 
     $("#msgA").val("");
     scroll();
 }
 
+// SEND B
 function sendB(){
     let msg = $("#msgB").val().trim();
-    if(msg === "") return;
+    if(msg==="") return;
 
-    // B side (right)
-    $("#chatB").append('<div class="msg right">'+msg+'</div>');
+    let t = getTime();
 
-    // A side (left)
-    $("#chatA").append('<div class="msg left">'+msg+'</div>');
+    $("#chatB").append(`<div class="msg right">${msg}<span class="time">${t}</span></div>`);
+    $("#chatA").append(`<div class="msg left">${msg}<span class="time">${t}</span></div>`);
 
     $("#msgB").val("");
     scroll();
 }
 
+// SCROLL
 function scroll(){
-    $(".messages").scrollTop(function(){
-        return this.scrollHeight;
+    $(".messages").each(function(){
+        $(this).scrollTop(this.scrollHeight);
     });
 }
+
+// ENTER KEY
+$("#msgA, #msgB").keypress(function(e){
+    if(e.which==13){
+        if(this.id=="msgA") sendA();
+        else sendB();
+    }
+});
 </script>
 
 </body>
